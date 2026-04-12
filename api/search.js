@@ -1,15 +1,19 @@
 /**
  * JW Images Search - Vercel Serverless Search Proxy
  *
- * CSE Setup Instructions:
+ * Setup Instructions:
+ *
+ * Google Custom Search:
  * 1. Create a CSE at https://programmablesearchengine.google.com
  *    - Restrict to jw.org and *.jw.org only
  *    - Enable Image Search
- * 2. Enable the "Custom Search JSON API" in Google Cloud Console
+ * 2. Enable the "Custom Search API" in Google Cloud Console
  * 3. Create an API key - restrict it to the CSE API only
- *    (no HTTP referrer restriction needed since calls are server-side)
- * 4. Add GOOGLE_CSE_ID and GOOGLE_API_KEY as environment variables
- *    in the Vercel project dashboard
+ * 4. Set SEARCH_API=google, GOOGLE_CSE_ID, and GOOGLE_API_KEY in Vercel
+ *
+ * Serper.dev:
+ * 1. Get API key at https://serper.dev
+ * 2. Set SEARCH_API=serper and SERPER_API_KEY in Vercel
  *
  * Never commit real credential values to git.
  */
@@ -20,7 +24,10 @@ const ALLOWED_ORIGIN = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : '*';
 
-const CSE_BASE = 'https://www.googleapis.com/customsearch/v1';
+const SEARCH_API = process.env.SEARCH_API || 'google';
+
+const GOOGLE_CSE_BASE = 'https://www.googleapis.com/customsearch/v1';
+const SERPER_BASE = 'https://google.serper.dev/images';
 const PAGE_SIZE = 10;
 const MAX_START = 91;
 
@@ -50,17 +57,25 @@ export default async function handler(req) {
     );
   }
 
+  if (SEARCH_API === 'serper') {
+    return handleSerper(q, start, headers);
+  }
+
+  return handleGoogle(q, start, headers);
+}
+
+async function handleGoogle(q, start, headers) {
   const CSE_ID  = process.env.GOOGLE_CSE_ID;
   const API_KEY = process.env.GOOGLE_API_KEY;
 
   if (!CSE_ID || !API_KEY) {
     return new Response(
-      JSON.stringify({ error: 'Server configuration error: missing credentials.' }),
+      JSON.stringify({ error: 'Server configuration error: missing Google credentials.' }),
       { status: 500, headers }
     );
   }
 
-  const url = new URL(CSE_BASE);
+  const url = new URL(GOOGLE_CSE_BASE);
   url.searchParams.set('key', API_KEY);
   url.searchParams.set('cx', CSE_ID);
   url.searchParams.set('q', q);
@@ -104,7 +119,71 @@ export default async function handler(req) {
     );
   } catch (err) {
     return new Response(
-      JSON.stringify({ error: 'Network error reaching search service.' }),
+      JSON.stringify({ error: 'Network error reaching Google search service.' }),
+      { status: 502, headers }
+    );
+  }
+}
+
+async function handleSerper(q, start, headers) {
+  const API_KEY = process.env.SERPER_API_KEY;
+
+  if (!API_KEY) {
+    return new Response(
+      JSON.stringify({ error: 'Server configuration error: missing Serper API key.' }),
+      { status: 500, headers }
+    );
+  }
+
+  const page = Math.ceil(start / PAGE_SIZE);
+
+  try {
+    const response = await fetch(SERPER_BASE, {
+      method: 'POST',
+      headers: {
+        'X-API-KEY': API_KEY,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        q: `${q} site:jw.org`,
+        gl: 'us',
+        hl: 'en',
+        safe: true,
+        page,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      const status = response.status;
+      let message = data.message || 'Search error. Please try again.';
+      if (status === 429) message = 'Too many requests. Please try again shortly.';
+      if (status === 401) message = 'Invalid Serper API key.';
+      return new Response(JSON.stringify({ error: message }), { status, headers });
+    }
+
+    const items = (data.images || []).map(item => ({
+      title: item.title,
+      imageUrl: item.imageUrl,
+      thumbnailUrl: item.thumbnailUrl,
+      width: item.width,
+      height: item.height,
+      sourceUrl: item.link,
+      displayDomain: new URL(item.link).hostname.replace('www.', ''),
+    }));
+
+    return new Response(
+      JSON.stringify({
+        items,
+        totalResults: data.totalImages ?? '0',
+        nextStart: items.length === PAGE_SIZE ? start + PAGE_SIZE : null,
+      }),
+      { status: 200, headers }
+    );
+  } catch (err) {
+    return new Response(
+      JSON.stringify({ error: 'Network error reaching Serper search service.' }),
       { status: 502, headers }
     );
   }
