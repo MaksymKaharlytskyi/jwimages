@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <!-- Primary Meta Tags -->
+  <title>JW Images Search - Search images on JW.org</title>
+  <meta name="title" content="JW Images Search - Search images on JW.org">
+  <meta name="description" content="Search images on JW.org by keyword. A fast, privacy-focused image search tool.">
+  <meta name="keywords" content="JW, images, search, JW.org, Bible, religious images">
+  <meta name="author" content="JW Images Search">
+  <meta name="theme-color" content="#7B5EA7">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://YOUR_DOMAIN/">
+  <meta property="og:title" content="JW Images Search - Search images on JW.org">
+  <meta property="og:description" content="Search images on JW.org by keyword. A fast, privacy-focused image search tool.">
+  <meta property="og:image" content="https://YOUR_DOMAIN/icons/icon-512.svg">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://YOUR_DOMAIN/">
+  <meta property="twitter:title" content="JW Images Search - Search images on JW.org">
+  <meta property="twitter:description" content="Search images on JW.org by keyword. A fast, privacy-focused image search tool.">
+  <meta property="twitter:image" content="https://YOUR_DOMAIN/icons/icon-512.svg">
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://YOUR_DOMAIN/">
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="JW Images">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" sizes="192x192" href="/icons/icon-192.svg">
+  <link rel="apple-touch-icon" href="/icons/icon-192.svg">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Nunito:wght@400;500;600&display=swap">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="/css/style.css">
+
+  <!-- Structured Data - WebSite with SearchAction -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "JW Images Search",
+    "url": "https://YOUR_DOMAIN/",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://YOUR_DOMAIN/?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
+          console.log('ServiceWorker registration successful with scope: ', registration.scope);
+        }, function(err) {
+          console.log('ServiceWorker registration failed: ', err);
+        });
+      });
+    }
+  </script>
+</head>
+<body>
+  <!-- Skip Link -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Header -->
+  <header role="banner">
+    <div class="header-content">
+      <h1 class="site-name">JW Images Search</h1>
+      <p class="site-tagline">Search images on JW.org</p>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main id="main-content" role="main">
+    <!-- Search Section -->
+    <section class="search-section" aria-label="Image search">
+      <form class="search-form" role="search" aria-label="Search images on JW.org">
+        <div class="search-input-wrapper">
+          <label for="search-input" class="visually-hidden">Search images on JW.org</label>
+          <input
+            type="search"
+            id="search-input"
+            class="search-input"
+            aria-label="Search images on JW.org"
+            placeholder="Search images…"
+            autocomplete="off"
+            spellcheck="false"
+            required
+            minlength="2"
+          >
+          <div id="search-error" class="search-error" role="alert" aria-hidden="true"></div>
+        </div>
+        <button type="submit" class="search-button" aria-label="Search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <span class="visually-hidden">Search</span>
+        </button>
+      </form>
+    </section>
+
+    <!-- Results Section -->
+    <section class="results-section" aria-label="Search results" aria-live="polite" aria-atomic="false">
+      <p class="results-info" aria-hidden="true"></p>
+
+      <div class="results-grid" aria-label="Image results">
+        <!-- Results will be inserted here -->
+      </div>
+
+      <!-- Loading Spinner -->
+      <div class="spinner-container" style="display: none;" aria-label="Loading results">
+        <div class="spinner" aria-hidden="true"></div>
+      </div>
+
+      <!-- Infinite Scroll Sentinel -->
+      <div class="scroll-sentinel" aria-hidden="true"></div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer role="contentinfo">
+    <div class="footer-content">
+      <nav class="footer-links" aria-label="Footer navigation">
+        <a href="/terms-of-use.html">Terms of Use</a>
+        <a href="/cookie-policy.html">Cookie Policy</a>
+        <a href="/privacy-policy.html">Privacy Policy</a>
+      </nav>
+      <p class="footer-disclaimer">
+        This is an independent tool. Not affiliated with jw.org or the Watchtower Bible and Tract Society.
+      </p>
+    </div>
+  </footer>
+
+  <!-- Application Script -->
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>
