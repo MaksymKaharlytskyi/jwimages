@@ -6,7 +6,8 @@
 import { CONFIG, fetchImages } from './search.js';
 
 let currentQuery = '';
-let currentPage = 1;
+let currentPage = 1;   // start index sent to API (1, 11, 21 …)
+let currentPageNum = 1; // human page count (1, 2, 3 …) used for MAX_PAGES check
 let isLoading = false;
 let hasMoreResults = true;
 let observer = null;
@@ -161,8 +162,9 @@ async function loadMore() {
 
     renderItems(data.items);
 
-    if (data.nextStart && currentPage < CONFIG.MAX_PAGES) {
+    if (data.nextStart && currentPageNum < CONFIG.MAX_PAGES) {
       currentPage = data.nextStart;
+      currentPageNum += 1;
     } else {
       hasMoreResults = false;
     }
@@ -223,6 +225,7 @@ function destroyInfiniteScroll() {
 async function initializeSearch(query) {
   currentQuery = query;
   currentPage = 1;
+  currentPageNum = 1;
   hasMoreResults = true;
   isLoading = false;
 
@@ -252,6 +255,7 @@ function reset() {
   destroyInfiniteScroll();
   currentQuery = '';
   currentPage = 1;
+  currentPageNum = 1;
   isLoading = false;
   hasMoreResults = true;
 

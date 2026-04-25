@@ -113,7 +113,7 @@ async function handleGoogle(q, start, headers) {
       JSON.stringify({
         items,
         totalResults: data.searchInformation?.totalResults ?? '0',
-        nextStart: items.length === PAGE_SIZE ? start + PAGE_SIZE : null,
+        nextStart: items.length > 0 && start < MAX_START ? start + PAGE_SIZE : null,
       }),
       { status: 200, headers }
     );
@@ -177,7 +177,7 @@ async function handleSerper(q, start, headers) {
       JSON.stringify({
         items,
         totalResults: data.totalImages ?? '0',
-        nextStart: items.length === PAGE_SIZE ? start + PAGE_SIZE : null,
+        nextStart: items.length > 0 && page < 10 ? start + PAGE_SIZE : null,
       }),
       { status: 200, headers }
     );
