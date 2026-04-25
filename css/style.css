@@ -186,7 +186,6 @@ main[role="main"] {
 
 .search-input:focus {
   border-color: var(--colour-border-focus);
-  box-shadow: var(--shadow-input);
 }
 
 /* Hide browser search cancel button */
@@ -232,7 +231,7 @@ main[role="main"] {
 }
 
 .search-button:focus-visible {
-  outline: 3px solid var(--colour-border-focus);
+  outline: 2px solid var(--colour-border-focus);
   outline-offset: 3px;
 }
 
@@ -693,7 +692,7 @@ footer[role="contentinfo"] {
 
 /* ── Focus styles (global) ───────────────────────────────── */
 :focus-visible {
-  outline: 3px solid var(--colour-border-focus);
+  outline: 2px solid var(--colour-border-focus);
   outline-offset: 3px;
 }
 
