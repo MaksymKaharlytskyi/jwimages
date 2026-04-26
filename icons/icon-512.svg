@@ -1,7 +1,82 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-  <rect width="512" height="512" fill="#F4F2F9"/>
-  <circle cx="256" cy="256" r="160" fill="#7B5EA7"/>
-  <circle cx="256" cy="256" r="106" fill="#FFFFFF"/>
-  <path d="M256 149 L256 213 M256 299 L256 363 M149 256 L213 256 M299 256 L363 256" stroke="#7B5EA7" stroke-width="21" stroke-linecap="round"/>
-  <circle cx="256" cy="256" r="42" fill="#7B5EA7"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <clipPath id="bg-clip">
+      <rect width="512" height="512" rx="112" ry="112"/>
+    </clipPath>
+    <clipPath id="photo-clip">
+      <rect x="128" y="158" width="256" height="196" rx="24"/>
+    </clipPath>
+    <clipPath id="lens-clip">
+      <circle cx="316" cy="302" r="46"/>
+    </clipPath>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#C8D4BE"/>
+      <stop offset="100%" stop-color="#A8B89E"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background: parchment -->
+  <rect width="512" height="512" rx="112" ry="112" fill="#F7F4EE"/>
+
+  <!-- Subtle grid lines -->
+  <g clip-path="url(#bg-clip)" stroke="#D8D2C4" stroke-width="1.2" opacity="0.7">
+    <line x1="0" y1="128" x2="512" y2="128"/>
+    <line x1="0" y1="256" x2="512" y2="256"/>
+    <line x1="0" y1="384" x2="512" y2="384"/>
+    <line x1="128" y1="0" x2="128" y2="512"/>
+    <line x1="256" y1="0" x2="256" y2="512"/>
+    <line x1="384" y1="0" x2="384" y2="512"/>
+  </g>
+
+  <!-- Back photo card (rotated left) -->
+  <rect x="128" y="158" width="256" height="196" rx="24"
+        fill="#EDE9DE" stroke="#C8BEA8" stroke-width="3"
+        transform="rotate(-9 256 256)"/>
+
+  <!-- Middle photo card (rotated right) -->
+  <rect x="128" y="158" width="256" height="196" rx="24"
+        fill="#fff" stroke="#C8BEA8" stroke-width="3"
+        transform="rotate(5 256 256)"/>
+
+  <!-- Main photo card -->
+  <rect x="128" y="158" width="256" height="196" rx="24"
+        fill="#fff" stroke="#C8BEA8" stroke-width="3"/>
+
+  <!-- Sky wash inside photo -->
+  <rect x="128" y="158" width="256" height="196" rx="24"
+        fill="url(#sky)" opacity="0.55" clip-path="url(#photo-clip)"/>
+
+  <!-- Sun -->
+  <circle cx="326" cy="202" r="28" fill="#F7C87A" opacity="0.95"
+          clip-path="url(#photo-clip)"/>
+
+  <!-- Hills -->
+  <ellipse cx="175" cy="354" rx="110" ry="68"
+           fill="#7A8C6E" clip-path="url(#photo-clip)"/>
+  <ellipse cx="310" cy="360" rx="100" ry="60"
+           fill="#5A7050" clip-path="url(#photo-clip)"/>
+  <ellipse cx="420" cy="370" rx="90" ry="55"
+           fill="#7A8C6E" clip-path="url(#photo-clip)"/>
+
+  <!-- Magnifying glass handle -->
+  <line x1="356" y1="342" x2="398" y2="384"
+        stroke="#1C1C18" stroke-width="20" stroke-linecap="round"/>
+
+  <!-- Magnifying glass outer ring -->
+  <circle cx="316" cy="302" r="68"
+          fill="white" stroke="#1C1C18" stroke-width="10"/>
+
+  <!-- Inner accent ring -->
+  <circle cx="316" cy="302" r="46"
+          fill="none" stroke="#B5935A" stroke-width="6"/>
+
+  <!-- Tiny landscape inside lens -->
+  <rect x="270" y="258" width="92" height="88"
+        fill="#C8D4BE" opacity="0.5" clip-path="url(#lens-clip)"/>
+  <ellipse cx="300" cy="348" rx="36" ry="22"
+           fill="#7A8C6E" clip-path="url(#lens-clip)"/>
+  <ellipse cx="336" cy="352" rx="30" ry="18"
+           fill="#5A7050" clip-path="url(#lens-clip)"/>
+  <circle cx="336" cy="272" r="10"
+          fill="#F7C87A" opacity="0.9" clip-path="url(#lens-clip)"/>
 </svg>
