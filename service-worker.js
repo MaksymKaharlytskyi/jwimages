@@ -3,10 +3,10 @@
  * PWA offline support with cache-first for static assets, network-first for API calls.
  */
 
-const CACHE_NAME = 'jw-images-v1';
-const STATIC_CACHE = 'jw-images-static-v1';
-const IMAGE_CACHE = 'jw-images-images-v1';
-const API_CACHE = 'jw-images-api-v1';
+const CACHE_NAME = 'jw-images-v2';
+const STATIC_CACHE = 'jw-images-static-v2';
+const IMAGE_CACHE = 'jw-images-images-v2';
+const API_CACHE = 'jw-images-api-v2';
 
 // Static assets to cache on install
 const STATIC_ASSETS = [

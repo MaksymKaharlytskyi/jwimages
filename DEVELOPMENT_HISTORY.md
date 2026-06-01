@@ -298,3 +298,43 @@ Both `icon-512.svg` and `icon-192.svg` are hand-crafted SVG. The `manifest.json`
 
 **Last Updated:** April 26, 2026
 **Next Review:** Before next development session
+
+---
+
+## Session: June 1, 2026 - Multi-Language Search Support
+
+**Developer:** Claude (Anthropic CLI)
+**Branch:** develop
+
+### Overview
+
+Added a language selector to the search UI that filters image results by language. Language preference persists across sessions via `localStorage`. Works with both Google CSE and Serper backends.
+
+### Languages Added
+
+English, Português, Español, Français, Deutsch, Русский, Українська (7 total).
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `api/search.js` | Added `SUPPORTED_LANGUAGES` map; reads `lang` query param; passes `lr`+`hl` to Google, `hl`+`gl` to Serper; backend now also detected via `SEARCH_BACKEND` env var (fallback to `SEARCH_API` for backwards compat) |
+| `js/search.js` | `fetchImages` accepts `lang` param (default `'en'`), forwards it to API |
+| `js/masonry.js` | `initializeSearch` accepts `lang` param; threads it through to `loadMore` → `fetchImages` |
+| `js/app.js` | Initialises `currentLang` from `localStorage`; sets selector on load; saves on search submit and on selector `change`; re-runs search immediately when language changed with results visible |
+| `index.html` | Added `<select id="lang-select">` between input wrapper and submit button |
+| `css/style.css` | Added `.lang-select` styles using only Lavender Dusk CSS custom properties; dark-mode ready |
+| `cookie-policy.html` | Added `last_lang` row to localStorage keys table |
+| `.env.example` | Created with `SEARCH_BACKEND`, `GOOGLE_CSE_ID`, `GOOGLE_API_KEY`, `SERPER_API_KEY` |
+| `service-worker.js` | Cache version bumped to `jw-images-v2` to force invalidation |
+
+### Key Decisions
+
+1. **`SEARCH_BACKEND` env var** — new canonical name; old `SEARCH_API` still works as fallback so existing deployments need no config change.
+2. **Unknown `lang` values** — silently fall back to English (no 400 error), matching the task spec.
+3. **Re-run on language change** — only triggers if a query of ≥ 2 chars is already in the input, avoiding a spurious search on page load.
+
+---
+
+**Last Updated:** June 1, 2026
+**Next Review:** Before next development session

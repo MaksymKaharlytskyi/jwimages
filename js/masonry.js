@@ -6,6 +6,7 @@
 import { CONFIG, fetchImages } from './search.js';
 
 let currentQuery = '';
+let currentLang = 'en';
 let currentPage = 1;   // start index sent to API (1, 11, 21 …)
 let currentPageNum = 1; // human page count (1, 2, 3 …) used for MAX_PAGES check
 let isLoading = false;
@@ -152,7 +153,7 @@ async function loadMore() {
   showLoading();
 
   try {
-    const data = await fetchImages(currentQuery, currentPage);
+    const data = await fetchImages(currentQuery, currentPage, currentLang);
 
     if (data.items.length === 0) {
       hasMoreResults = false;
@@ -222,8 +223,9 @@ function destroyInfiniteScroll() {
  * Initialize search with query
  * @param {string} query - Search query
  */
-async function initializeSearch(query) {
+async function initializeSearch(query, lang = 'en') {
   currentQuery = query;
+  currentLang = lang;
   currentPage = 1;
   currentPageNum = 1;
   hasMoreResults = true;
