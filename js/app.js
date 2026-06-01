@@ -118,10 +118,6 @@ function setupEventListeners() {
     langSelect.addEventListener('change', () => {
       currentLang = langSelect.value;
       localStorage.setItem('last_lang', currentLang);
-      const query = searchInput ? searchInput.value.trim() : '';
-      if (query.length >= 2) {
-        initializeSearch(query, currentLang);
-      }
     });
   }
 }
