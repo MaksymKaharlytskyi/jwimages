@@ -24,7 +24,17 @@ const ALLOWED_ORIGIN = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : '*';
 
-const SEARCH_API = process.env.SEARCH_API || 'google';
+const SEARCH_API = process.env.SEARCH_BACKEND || process.env.SEARCH_API || 'google';
+
+const SUPPORTED_LANGUAGES = {
+  en: { lr: 'lang_en', hl: 'en', gl: 'us' },
+  pt: { lr: 'lang_pt', hl: 'pt', gl: 'pt' },
+  es: { lr: 'lang_es', hl: 'es', gl: 'es' },
+  fr: { lr: 'lang_fr', hl: 'fr', gl: 'fr' },
+  de: { lr: 'lang_de', hl: 'de', gl: 'de' },
+  ru: { lr: 'lang_ru', hl: 'ru', gl: 'ru' },
+  uk: { lr: 'lang_uk', hl: 'uk', gl: 'ua' },
+};
 
 const GOOGLE_CSE_BASE = 'https://www.googleapis.com/customsearch/v1';
 const SERPER_BASE = 'https://google.serper.dev/images';
@@ -49,6 +59,8 @@ export default async function handler(req) {
     parseInt(searchParams.get('start') || '1', 10),
     MAX_START
   );
+  const langKey = (searchParams.get('lang') || 'en').toLowerCase();
+  const lang = SUPPORTED_LANGUAGES[langKey] ?? SUPPORTED_LANGUAGES['en'];
 
   if (!q || q.length < 2) {
     return new Response(
@@ -58,13 +70,13 @@ export default async function handler(req) {
   }
 
   if (SEARCH_API === 'serper') {
-    return handleSerper(q, start, headers);
+    return handleSerper(q, start, lang, headers);
   }
 
-  return handleGoogle(q, start, headers);
+  return handleGoogle(q, start, lang, headers);
 }
 
-async function handleGoogle(q, start, headers) {
+async function handleGoogle(q, start, lang, headers) {
   const CSE_ID  = process.env.GOOGLE_CSE_ID;
   const API_KEY = process.env.GOOGLE_API_KEY;
 
@@ -85,6 +97,8 @@ async function handleGoogle(q, start, headers) {
   url.searchParams.set('num', String(PAGE_SIZE));
   url.searchParams.set('start', String(start));
   url.searchParams.set('safe', 'active');
+  url.searchParams.set('lr', lang.lr);
+  url.searchParams.set('hl', lang.hl);
   url.searchParams.set('fields', 'items(title,link,image,displayLink),queries,searchInformation');
 
   try {
@@ -125,7 +139,7 @@ async function handleGoogle(q, start, headers) {
   }
 }
 
-async function handleSerper(q, start, headers) {
+async function handleSerper(q, start, lang, headers) {
   const API_KEY = process.env.SERPER_API_KEY;
 
   if (!API_KEY) {
@@ -146,8 +160,8 @@ async function handleSerper(q, start, headers) {
       },
       body: JSON.stringify({
         q: `${q} site:jw.org`,
-        gl: 'us',
-        hl: 'en',
+        gl: lang.gl,
+        hl: lang.hl,
         safe: true,
         page,
       }),

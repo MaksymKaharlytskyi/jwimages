@@ -14,8 +14,8 @@ const CONFIG = {
  * @param {number} startIndex - Starting index for pagination
  * @returns {Promise<{items: Array, totalResults: string, nextStart: number|null}>}
  */
-async function fetchImages(query, startIndex = 1) {
-  const params = new URLSearchParams({ q: query, start: String(startIndex) });
+async function fetchImages(query, startIndex = 1, lang = 'en') {
+  const params = new URLSearchParams({ q: query, start: String(startIndex), lang });
   const res = await fetch(`/api/search?${params}`);
   const data = await res.json();
 

@@ -235,6 +235,47 @@ main[role="main"] {
   outline-offset: 3px;
 }
 
+.lang-select {
+  height: 48px;
+  padding: 0 2rem 0 0.85rem;
+  border: 2px solid var(--colour-border);
+  border-radius: var(--radius-md);
+  background-color: var(--colour-surface);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237B5EA7' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.65rem center;
+  appearance: none;
+  -webkit-appearance: none;
+  color: var(--colour-text);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  flex-shrink: 0;
+}
+
+.lang-select:hover {
+  border-color: var(--colour-primary);
+}
+
+.lang-select:focus {
+  outline: 3px solid var(--colour-border-focus);
+  outline-offset: 3px;
+  border-color: var(--colour-primary);
+}
+
+.lang-select option {
+  background-color: var(--colour-surface);
+  color: var(--colour-text);
+}
+
+@media (max-width: 360px) {
+  .lang-select {
+    width: 100%;
+  }
+}
+
 /* ── Results section ─────────────────────────────────────── */
 .results-section {
   min-height: 200px;

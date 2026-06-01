@@ -215,95 +215,126 @@ vercel env add GOOGLE_API_KEY production
 
 ---
 
+**Last Updated:** April 12, 2026
+**Next Review:** Before next development session
+
 ---
 
-## Session: April 25, 2026 - Infinite Scroll Bug Fix & Serper API Support
+## Session: April 26, 2026 - Design Overhaul
 
-**Developer:** Claude (Anthropic)
+**Developer:** Claude (claude.ai)
 
 ### Overview
 
-Diagnosed and fixed infinite scroll not working when using the Serper API. Three bugs were found across two files — one caused infinite scroll to stop after the first page, one was a runtime crash risk, and one caused premature scroll termination when Serper returns fewer than 10 results per page.
-
----
-
-### Root Cause Analysis
-
-The app was originally built assuming Google CSE as the sole search backend. When Serper support was added to `api/search.js`, two pagination assumptions broke silently:
-
-1. **Serper doesn't always return exactly 10 results per page** even when more pages exist. The `nextStart` condition `items.length === PAGE_SIZE` evaluated to `false` and set `nextStart: null`, stopping infinite scroll after page 1.
-
-2. **`handleGoogle` used an undefined variable `page`** in its `nextStart` expression — a copy-paste error from the Serper fix. This would throw a `ReferenceError` at runtime on any Google CSE search.
-
-3. **`js/masonry.js` compared the start index to `MAX_PAGES`** — `currentPage` held a start index (1, 11, 21…) but was compared against `CONFIG.MAX_PAGES` (10). From page 2 onwards, `11 < 10` is always `false`, so `hasMoreResults` was set to `false` immediately after the first load-more, regardless of API backend.
+Complete visual redesign of the application. The original Lavender Dusk palette and layout were replaced with a new Sand & Sage design system. PWA icons were also redesigned from scratch. Minor UX copy improvements were made to the header.
 
 ---
 
 ### Files Changed
 
-#### `api/search.js`
-
-| Location | Change |
-|---|---|
-| `handleGoogle()` — `nextStart` | Fixed undefined `page` variable → now uses `start < MAX_START` |
-| `handleSerper()` — `nextStart` | Changed `=== PAGE_SIZE` to `> 0 && page < 10` to handle partial Serper pages |
-
-```js
-// handleGoogle — before (runtime crash: page is undefined)
-nextStart: items.length > 0 && page < 10 ? start + PAGE_SIZE : null,
-
-// handleGoogle — after
-nextStart: items.length > 0 && start < MAX_START ? start + PAGE_SIZE : null,
-
-// handleSerper — before (stops scroll if Serper returns < 10 items)
-nextStart: items.length === PAGE_SIZE ? start + PAGE_SIZE : null,
-
-// handleSerper — after
-nextStart: items.length > 0 && page < 10 ? start + PAGE_SIZE : null,
-```
-
-#### `js/masonry.js`
-
-| Location | Change |
-|---|---|
-| Module state | Added `currentPageNum` counter (human page count 1, 2, 3…) separate from `currentPage` (start index 1, 11, 21…) |
-| `loadMore()` | Guard changed from `currentPage < CONFIG.MAX_PAGES` to `currentPageNum < CONFIG.MAX_PAGES` |
-| `initializeSearch()` | Resets `currentPageNum = 1` on new search |
-| `reset()` | Resets `currentPageNum = 1` on reset |
-
-```js
-// Before — currentPage is 11 after page 1; 11 < 10 is false → scroll dies
-if (data.nextStart && currentPage < CONFIG.MAX_PAGES) {
-  currentPage = data.nextStart;
-
-// After — currentPageNum increments by 1 per page (1, 2, 3…)
-if (data.nextStart && currentPageNum < CONFIG.MAX_PAGES) {
-  currentPage = data.nextStart;
-  currentPageNum += 1;
-```
+| File | Change |
+|------|--------|
+| `css/style.css` | Full replacement — new design system, fonts, and layout |
+| `icons/icon-192.svg` | Replaced — new Parchment Gallery icon concept |
+| `icons/icon-512.svg` | Replaced — new Parchment Gallery icon concept |
+| `index.html` | Header copy updated — tagline replaced with expanded description |
 
 ---
 
-### Environment Variables (Serper)
+### Design System: Sand & Sage
 
-To use Serper instead of Google CSE, set the following in Vercel:
+Replaced the original Lavender Dusk palette entirely. New CSS custom properties in `:root`:
 
-| Variable | Value |
-|---|---|
-| `SEARCH_API` | `serper` |
-| `SERPER_API_KEY` | Your Serper API key from serper.dev |
+```css
+--colour-bg:            #F7F4EE;   /* parchment page background */
+--colour-surface:       #FFFFFF;   /* card / lightbox background */
+--colour-surface-2:     #EDE9DE;   /* secondary surface, cookie banner */
+--colour-surface-3:     #E4DFD2;   /* tertiary surface, image placeholders */
+--colour-primary:       #1C1C18;   /* deep charcoal — buttons, text */
+--colour-accent:        #7A8C6E;   /* sage green — links, focus rings */
+--colour-accent-warm:   #B5935A;   /* warm sand — decorative accents */
+--colour-text:          #1C1C18;   /* primary text */
+--colour-text-muted:    #7A7A6A;   /* secondary text */
+--colour-border:        #D8D2C4;   /* borders */
+```
 
-For Google CSE, set `SEARCH_API=google` (or omit it, as `google` is the default).
+**Typography:** Switched from `DM Serif Display` + `Nunito` to `Lora` (serif, display use) + `DM Sans` (body). Both loaded via `@import` inside `style.css` — the `<link>` tags for Google Fonts were removed from all HTML files.
+
+**Shape:** Rounded corners throughout (`--radius-md: 14px` on inputs and cards, `--radius-xl: 28px` on lightbox panel, pill-shaped buttons).
+
+---
+
+### Header Redesign
+
+- Removed white background and bottom border from `<header>` — header is now transparent, merging seamlessly with the parchment page background.
+- Title and tagline centred (previously left-aligned).
+- Site name font size increased to `2rem` for stronger presence.
+- Tagline ("Search images on JW.org") removed and replaced with a richer multi-sentence description paragraph (`.site-description`) explaining what the app does, how to use it, and linking to JW.org.
+
+---
+
+### PWA Icons
+
+Three icon concepts were proposed and the **Parchment Gallery** concept was chosen:
+
+- Parchment (`#F7F4EE`) background with subtle grid texture
+- Stack of three photo cards fanned at slight rotations
+- Landscape scene inside the top card (sage hills, golden sun, sky wash)
+- Magnifying glass overlaid in the bottom-right corner with a warm sand (`#B5935A`) accent ring and a miniature landscape inside the lens
+
+Both `icon-512.svg` and `icon-192.svg` are hand-crafted SVG. The `manifest.json` and `index.html` already referenced these filenames so no other changes were needed.
 
 ---
 
 ### Technical Notes
 
-- Serper's `/images` endpoint uses a `page` parameter (1-based), not a `start` index. The conversion `page = Math.ceil(start / PAGE_SIZE)` in `handleSerper` is correct and was not changed.
-- Serper has no documented hard cap equivalent to Google CSE's 100-result limit. The `page < 10` guard (10 pages × up to 10 results = up to 100 results) is a conservative client-side limit.
-- The service worker cache version (`jw-images-v1`) should be incremented after deploying these JS changes to force cache invalidation for returning users.
+1. **Font loading moved to CSS:** The `@import` in `style.css` handles Google Fonts. Remove any remaining `<link rel="stylesheet" href="https://fonts.googleapis.com/...">` lines from HTML files — they load the old fonts (DM Serif Display, Nunito) which are no longer used.
+
+2. **Service worker cache:** Increment the cache name from `jw-images-v1` to `jw-images-v2` before the next production deploy to force all clients to pick up the new `style.css`.
+
+3. **Icon format:** Icons remain SVG. The `manifest.json` references `image/svg+xml` type — supported on all modern browsers and iOS Safari 16.4+.
 
 ---
 
-**Last Updated:** April 25, 2026
+**Last Updated:** April 26, 2026
+**Next Review:** Before next development session
+
+---
+
+## Session: June 1, 2026 - Multi-Language Search Support
+
+**Developer:** Claude (Anthropic CLI)
+**Branch:** develop
+
+### Overview
+
+Added a language selector to the search UI that filters image results by language. Language preference persists across sessions via `localStorage`. Works with both Google CSE and Serper backends.
+
+### Languages Added
+
+English, Português, Español, Français, Deutsch, Русский, Українська (7 total).
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `api/search.js` | Added `SUPPORTED_LANGUAGES` map; reads `lang` query param; passes `lr`+`hl` to Google, `hl`+`gl` to Serper; backend now also detected via `SEARCH_BACKEND` env var (fallback to `SEARCH_API` for backwards compat) |
+| `js/search.js` | `fetchImages` accepts `lang` param (default `'en'`), forwards it to API |
+| `js/masonry.js` | `initializeSearch` accepts `lang` param; threads it through to `loadMore` → `fetchImages` |
+| `js/app.js` | Initialises `currentLang` from `localStorage`; sets selector on load; saves on search submit and on selector `change`; re-runs search immediately when language changed with results visible |
+| `index.html` | Added `<select id="lang-select">` between input wrapper and submit button |
+| `css/style.css` | Added `.lang-select` styles using only Lavender Dusk CSS custom properties; dark-mode ready |
+| `cookie-policy.html` | Added `last_lang` row to localStorage keys table |
+| `.env.example` | Created with `SEARCH_BACKEND`, `GOOGLE_CSE_ID`, `GOOGLE_API_KEY`, `SERPER_API_KEY` |
+| `service-worker.js` | Cache version bumped to `jw-images-v2` to force invalidation |
+
+### Key Decisions
+
+1. **`SEARCH_BACKEND` env var** — new canonical name; old `SEARCH_API` still works as fallback so existing deployments need no config change.
+2. **Unknown `lang` values** — silently fall back to English (no 400 error), matching the task spec.
+3. **Re-run on language change** — only triggers if a query of ≥ 2 chars is already in the input, avoiding a spurious search on page load.
+
+---
+
+**Last Updated:** June 1, 2026
 **Next Review:** Before next development session

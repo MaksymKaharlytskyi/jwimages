@@ -12,6 +12,8 @@ let searchForm = null;
 let searchInput = null;
 let searchButton = null;
 let errorEl = null;
+let langSelect = null;
+let currentLang = localStorage.getItem('last_lang') || 'en';
 
 /**
  * Setup DOM references
@@ -21,6 +23,8 @@ function setupDOM() {
   searchInput = document.querySelector('.search-input');
   searchButton = document.querySelector('.search-button');
   errorEl = document.querySelector('.search-error');
+  langSelect = document.getElementById('lang-select');
+  if (langSelect) langSelect.value = currentLang;
 }
 
 /**
@@ -64,7 +68,9 @@ async function handleSearch(e) {
 
   clearSearchError();
   saveLastQuery(query.trim());
-  await initializeSearch(query.trim());
+  currentLang = langSelect ? langSelect.value : currentLang;
+  localStorage.setItem('last_lang', currentLang);
+  await initializeSearch(query.trim(), currentLang);
 }
 
 /**
@@ -106,6 +112,13 @@ function setupEventListeners() {
   if (searchInput) {
     searchInput.addEventListener('input', handleInput);
     searchInput.addEventListener('keydown', handleKeydown);
+  }
+
+  if (langSelect) {
+    langSelect.addEventListener('change', () => {
+      currentLang = langSelect.value;
+      localStorage.setItem('last_lang', currentLang);
+    });
   }
 }
 
